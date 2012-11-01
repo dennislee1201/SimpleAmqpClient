@@ -61,6 +61,24 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
+Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max)
+{
+  amqp_connection_info info;
+  amqp_default_connection_info(&info);
+
+  if (0 != amqp_parse_url(const_cast<char *>(uri.c_str()), &info))
+  {
+    throw std::runtime_error("Bad URI");
+  }
+
+  return Create(std::string(info.host),
+                info.port,
+                std::string(info.user),
+                std::string(info.password),
+                std::string(info.vhost),
+                frame_max);
+}
+
 Channel::Channel(const std::string& host,
                  int port,
                  const std::string& username,
